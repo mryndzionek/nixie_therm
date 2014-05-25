@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project(nixie_clock)
+project(nixie_therm)
 
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 0)
