@@ -1,7 +1,7 @@
 Nixie 1-wire thermometer
 ========================
 
-->![nixie_therm](images/therm.png?raw=true "Nixie thermometer")<-
+![nixie_therm](images/therm.png?raw=true "Nixie thermometer")
 
 Introduction
 ------------
