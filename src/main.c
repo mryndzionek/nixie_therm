@@ -1,10 +1,13 @@
+
 #include "USI_TWI_Master.h"
+#include "DS1820.h"
 #include <avr/io.h>
 #include <util/delay.h>
 
 #define LED PD6
 #define PWM_DIGIT_1 PB2
 #define PWM_DIGIT_2 PB3
+#define MINUS_SIGN PB1
 #define BUTTON PB0
 
 #define PCF8574_ADDRESS 0x38
@@ -23,6 +26,9 @@ static const unsigned char DIM_SCALE[] = { 0x05, 0x05, 0x06, 0x07, 0x08, 0x09, 0
 static void setup() {
 
     set_output(DDRD, LED);
+    set_output(DDRB, MINUS_SIGN);
+    output_low(PORTB, MINUS_SIGN);
+
     set_output(DDRB, PWM_DIGIT_1);
     TCCR0A = _BV(COM0A1) | _BV(WGM00);
     OCR0A  = 0xFF;
@@ -32,7 +38,6 @@ static void setup() {
     TCCR1A = (1 << COM1A1)| (1 << WGM11) | (1 << WGM10);
     OCR1A = 0x3FF;
     TCCR1B = _BV(CS10) | _BV(CS11);
-
 
     set_input(DDRB, BUTTON);
 
@@ -48,7 +53,7 @@ static void dimm_digit(unsigned int digit, unsigned int level)
     if(digit == 0)
         OCR0A = scaled_level;
     else {
-        OCR1A = scaled_level << 2;
+            OCR1A = scaled_level << 2;
     }
 
 }
@@ -76,23 +81,36 @@ static unsigned int display_number(unsigned int n) {
     return  USI_TWI_Get_State_Info();
 }
 
+static void display_temp(int16_t temp)
+{
+    if((temp>>8) == 0xFF)
+        {
+            temp = ((~temp) & 0xFF) + 1;
+            output_high(PORTB, MINUS_SIGN);
+        } else
+            output_low(PORTB, MINUS_SIGN);
+
+    display_number(temp>>1);
+}
+
 int main(void) {
 
-    int n = 0;
-    unsigned int level = 0;
+    int16_t temp;
 
     setup();
 
     while (1) {
-            display_number(n++);
 
-            dimm_digit(0, level);
-            dimm_digit(1, level);
-            level++;
-            if(level > 0xFF)
-                level = 0;
-            if(n > 99)
-                n = 0;
-            _delay_ms(100);
+            ds1820_read_temperature(&temp);
+            display_temp(temp);
+            dimm_digit(0, 0xFF);
+            dimm_digit(1, 0xFF);
+            _delay_ms(200);
+            dimm_digit(0, 0xa0);
+            dimm_digit(1, 0xa0);
+            _delay_ms(300);
+            dimm_digit(0, 0x10);
+            dimm_digit(1, 0x10);
+            _delay_ms(10000);
     }
 }

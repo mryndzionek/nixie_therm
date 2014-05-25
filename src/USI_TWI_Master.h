@@ -21,7 +21,6 @@
 //********** Defines **********//
 
 // Defines controlling timing limits - SCL <= 100KHz.
-#define F_CPU 8000000UL       // Sets up the default speed for delay.h
 
 // For use with _delay_us()
 #define T2_TWI    5 		// >4,7us
