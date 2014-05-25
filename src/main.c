@@ -22,32 +22,44 @@ static void setup() {
     USI_TWI_Master_Initialise();
 }
 
-static void blink(int n)
+static void dimm_digit(unsigned int digit, unsigned int level)
 {
-    int i;
-    for(i=0; i<n;i++)
-        {
-            output_high(PORTD, LED);
-            _delay_ms(100);
-            // now turn off the LED for another 200ms
-            output_low(PORTD, LED);
-            _delay_ms(200);
-        }
+
+}
+
+static unsigned int display_number(unsigned int n) {
+
+    unsigned char data[2];
+    unsigned int digit_1 = 0;
+    unsigned int digit_2 = 0;
+
+    if(n > 99)
+        n = 99;
+
+    digit_1 = n % 10;
+    digit_2 = n / 10;
+
+    if (digit_2 == 8) digit_2 = 9;
+    else if (digit_2 == 9) digit_2 = 8;
+
+    data[0] = PCF8574_ADDRESS << 1;
+    data[1] = (digit_1 << 4) | (digit_2);
+
+    USI_TWI_Start_Read_Write(data, 2);
+
+    return  USI_TWI_Get_State_Info();
 }
 
 int main(void) {
 
-    unsigned char data[2];
+    int n = 0;
 
     setup();
 
-    data[0] = PCF8574_ADDRESS << 1;
-    data[1] = 0x11;
-    USI_TWI_Start_Read_Write(data, 2);
-    int s = USI_TWI_Get_State_Info();
-
     while (1) {
-            blink(s);
-            _delay_ms(1000);
+            display_number(n++);
+            if(n > 99)
+                n = 0;
+            _delay_ms(100);
     }
 }
