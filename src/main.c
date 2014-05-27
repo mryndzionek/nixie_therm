@@ -9,10 +9,10 @@
 #include <avr/interrupt.h>
 #include <avr/power.h>
 
-#define LED PD6
+#define BLUE_LED PD6
 #define PWM_DIGIT_1 PB2
 #define PWM_DIGIT_2 PB3
-#define MINUS_SIGN PB1
+#define RED_LED PB1
 #define BUTTON PB0
 
 #define PCF8574_ADDRESS 0x38
@@ -24,9 +24,10 @@
 
 static void setup() {
 
-    set_output(DDRD, LED);
-    set_output(DDRB, MINUS_SIGN);
-    output_low(PORTB, MINUS_SIGN);
+    set_output(DDRD, BLUE_LED);
+    output_low(PORTD, BLUE_LED);
+    set_output(DDRB, RED_LED);
+    output_low(PORTB, RED_LED);
 
     set_output(DDRB, PWM_DIGIT_1);
     TCCR0A = _BV(COM0A1) | _BV(WGM00);
@@ -83,16 +84,16 @@ static void display_temp(int16_t temp)
     if((temp>>8) == 0xFF)
         {
             temp = ((~temp) & 0xFF) + 1;
-            output_high(PORTB, MINUS_SIGN);
+            output_high(PORTB, BLUE_LED);
         } else
-            output_low(PORTB, MINUS_SIGN);
+            output_low(PORTB, BLUE_LED);
 
     display_number(temp>>1);
 }
 
 ISR(WDT_OVERFLOW_vect)
 {
-
+    PORTB ^= _BV(RED_LED);
 }
 
 void sleep()
