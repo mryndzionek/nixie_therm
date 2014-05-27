@@ -133,14 +133,14 @@ unsigned char USI_TWI_Start_Transceiver_With_Data( unsigned char *msg, unsigned 
   PORT_USI |= (1<<PIN_USI_SCL);                     // Release SCL.
   while( !(PIN_USI & (1<<PIN_USI_SCL)) );          // Verify that SCL becomes high.
 #ifdef TWI_FAST_MODE
-  _delay_us( T4_TWI/4 );                         // Delay for T4TWI if TWI_FAST_MODE
+  __builtin_avr_delay_cycles( T4_TWI/4 );                         // Delay for T4TWI if TWI_FAST_MODE
 #else
-  _delay_us( T2_TWI/4 );                         // Delay for T2TWI if TWI_STANDARD_MODE
+  __builtin_avr_delay_cycles( T2_TWI/4 );                         // Delay for T2TWI if TWI_STANDARD_MODE
 #endif
 
 /* Generate Start Condition */
   PORT_USI &= ~(1<<PIN_USI_SDA);                    // Force SDA LOW.
-  _delay_us( T4_TWI/4 );                         
+  __builtin_avr_delay_cycles( T4_TWI/4 );
   PORT_USI &= ~(1<<PIN_USI_SCL);                    // Pull SCL LOW.
   PORT_USI |= (1<<PIN_USI_SDA);                     // Release SDA.
 
@@ -216,14 +216,14 @@ unsigned char USI_TWI_Master_Transfer( unsigned char temp )
            (1<<USITC);                              // Toggle Clock Port.
   do
   {
-    _delay_us( T2_TWI/4 );              
+    __builtin_avr_delay_cycles( T2_TWI/4 );
     USICR = temp;                          // Generate positve SCL edge.
     while( !(PIN_USI & (1<<PIN_USI_SCL)) );// Wait for SCL to go high.
-    _delay_us( T4_TWI/4 );              
+    __builtin_avr_delay_cycles( T4_TWI/4 );
     USICR = temp;                          // Generate negative SCL edge.
   }while( !(USISR & (1<<USIOIF)) );        // Check for transfer complete.
   
-  _delay_us( T2_TWI/4 );                
+  __builtin_avr_delay_cycles( T2_TWI/4 );
   temp  = USIDR;                           // Read out data.
   USIDR = 0xFF;                            // Release SDA.
   DDR_USI |= (1<<PIN_USI_SDA);             // Enable SDA as output.
@@ -240,9 +240,9 @@ unsigned char USI_TWI_Master_Stop( void )
   PORT_USI &= ~(1<<PIN_USI_SDA);           // Pull SDA low.
   PORT_USI |= (1<<PIN_USI_SCL);            // Release SCL.
   while( !(PIN_USI & (1<<PIN_USI_SCL)) );  // Wait for SCL to go high.
-  _delay_us( T4_TWI/4 );               
+  __builtin_avr_delay_cycles( T4_TWI/4 );
   PORT_USI |= (1<<PIN_USI_SDA);            // Release SDA.
-  _delay_us( T2_TWI/4 );                
+  __builtin_avr_delay_cycles( T2_TWI/4 );
   
 #ifdef SIGNAL_VERIFY
   if( !(USISR & (1<<USIPF)) )

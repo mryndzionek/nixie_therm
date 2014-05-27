@@ -73,7 +73,7 @@ static unsigned int display_number(unsigned int n) {
     data[0] = PCF8574_ADDRESS << 1;
     data[1] = (digit_1 << 4) | (digit_2);
 
-    USI_TWI_Start_Read_Write(data, 2);
+    USI_TWI_Start_Transceiver_With_Data(data, 2);
 
     return  USI_TWI_Get_State_Info();
 }
