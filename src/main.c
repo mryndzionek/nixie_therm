@@ -4,6 +4,11 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include <avr/wdt.h>
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
+#include <avr/power.h>
+
 #define LED PD6
 #define PWM_DIGIT_1 PB2
 #define PWM_DIGIT_2 PB3
@@ -93,12 +98,31 @@ static void display_temp(int16_t temp)
     display_number(temp>>1);
 }
 
+ISR(WDT_OVERFLOW_vect)
+{
+    PORTD ^= _BV(LED);
+}
+
+void sleep()
+{
+    WDTCSR |= (1<<WDP3) | (1<<WDP0);
+    WDTCSR |= (1<<WDIE);
+    set_sleep_mode(SLEEP_MODE_IDLE);
+    sleep_enable();
+    sleep_cpu();
+
+    //wake up
+    sleep_disable();
+    MCUSR = 0;
+}
+
 int main(void) {
 
     int16_t temp;
 
     setup();
 
+    sei();
     while (1) {
 
             ds1820_read_temperature(&temp);
@@ -111,6 +135,7 @@ int main(void) {
             _delay_ms(300);
             dimm_digit(0, 0x10);
             dimm_digit(1, 0x10);
-            _delay_ms(10000);
+
+            sleep();
     }
 }
