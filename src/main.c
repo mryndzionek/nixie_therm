@@ -93,7 +93,7 @@ static void display_temp(int16_t temp)
 
 ISR(WDT_OVERFLOW_vect)
 {
-    PORTB ^= _BV(RED_LED);
+
 }
 
 void sleep()
@@ -118,19 +118,26 @@ int main(void) {
     sei();
     while (1) {
 
-            ds1820_read_temperature(&temp);
-            display_temp(temp);
-            dimm_digit(0, 0xFF);
-            dimm_digit(1, 0xFF);
-            _delay_ms(500);
-            dimm_digit(0, 0xa0);
-            dimm_digit(1, 0xa0);
-            _delay_ms(200);
-            dimm_digit(0, 0x10);
-            dimm_digit(1, 0x10);
-            _delay_ms(200);
-            dimm_digit(0, 0x00);
-            dimm_digit(1, 0x00);
+            int rc = ds1820_read_temperature(&temp);
+            if(rc == EXIT_SUCCESS)
+                {
+                    display_temp(temp);
+                    dimm_digit(0, 0xFF);
+                    dimm_digit(1, 0xFF);
+                    _delay_ms(500);
+                    dimm_digit(0, 0xa0);
+                    dimm_digit(1, 0xa0);
+                    _delay_ms(200);
+                    dimm_digit(0, 0x10);
+                    dimm_digit(1, 0x10);
+                    _delay_ms(200);
+                    dimm_digit(0, 0x00);
+                    dimm_digit(1, 0x00);
+                } else {
+                        output_high(PORTB, RED_LED);
+                        _delay_ms(20);
+                        output_low(PORTB, RED_LED);
+                }
 
             sleep();
     }
