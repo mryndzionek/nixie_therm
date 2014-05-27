@@ -21,6 +21,9 @@
 #define output_high(port,pin) port |= (1<<pin)
 #define set_input(portdir,pin) portdir &= ~(1<<pin)
 #define set_output(portdir,pin) portdir |= (1<<pin)
+#define WDT_MAX 4
+
+volatile unsigned int wdt_count = WDT_MAX;
 
 static void setup() {
 
@@ -93,7 +96,7 @@ static void display_temp(int16_t temp)
 
 ISR(WDT_OVERFLOW_vect)
 {
-
+    wdt_count--;
 }
 
 void sleep()
@@ -139,6 +142,9 @@ int main(void) {
                         output_low(PORTB, RED_LED);
                 }
 
-            sleep();
+            while(wdt_count)
+                sleep();
+
+            wdt_count = WDT_MAX;
     }
 }
