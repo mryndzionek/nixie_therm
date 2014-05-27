@@ -24,6 +24,7 @@
 #define WDT_MAX 4
 
 volatile unsigned int wdt_count = WDT_MAX;
+volatile unsigned int button = 0;
 
 static void setup() {
 
@@ -99,6 +100,11 @@ ISR(WDT_OVERFLOW_vect)
     wdt_count--;
 }
 
+ISR (PCINT_vect)
+{
+    button = 1;
+}
+
 void sleep()
 {
     WDTCSR |= (1<<WDP3) | (1<<WDP0);
@@ -117,6 +123,9 @@ int main(void) {
     int16_t temp;
 
     setup();
+
+    GIMSK |= _BV (PCIE);
+    PCMSK |= _BV (PCINT0);
 
     sei();
     while (1) {
@@ -142,7 +151,10 @@ int main(void) {
                         output_low(PORTB, RED_LED);
                 }
 
-            while(wdt_count)
+            if(button)
+                button = 0;
+
+            while(wdt_count && (button == 0))
                 sleep();
 
             wdt_count = WDT_MAX;
