@@ -22,12 +22,6 @@
 #define set_input(portdir,pin) portdir &= ~(1<<pin)
 #define set_output(portdir,pin) portdir |= (1<<pin)
 
-static const unsigned char DIM_SCALE[] = { 0x05, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10, 0x11,
-        0x12, 0x13, 0x20, 0x25, 0x35, 0x40, 0x45, 0x50,
-        0x55, 0x60, 0x65, 0x70, 0x75, 0x80, 0x90, 0xa0,
-        0xb0, 0xc0, 0xd0, 0xe0, 0xf0, 0xff, 0xff, 0xff
-};
-
 static void setup() {
 
     set_output(DDRD, LED);
@@ -53,12 +47,10 @@ static void dimm_digit(unsigned int digit, unsigned int level)
 {
     if(level > 0xFF) level = 0xFF;
 
-    unsigned char scaled_level = DIM_SCALE[level >> 3];
-
     if(digit == 0)
-        OCR0A = scaled_level;
+        OCR0A = level;
     else {
-            OCR1A = scaled_level << 2;
+            OCR1A = level << 2;
     }
 
 }
@@ -100,7 +92,7 @@ static void display_temp(int16_t temp)
 
 ISR(WDT_OVERFLOW_vect)
 {
-    PORTD ^= _BV(LED);
+
 }
 
 void sleep()
@@ -129,12 +121,15 @@ int main(void) {
             display_temp(temp);
             dimm_digit(0, 0xFF);
             dimm_digit(1, 0xFF);
-            _delay_ms(200);
+            _delay_ms(500);
             dimm_digit(0, 0xa0);
             dimm_digit(1, 0xa0);
-            _delay_ms(300);
+            _delay_ms(200);
             dimm_digit(0, 0x10);
             dimm_digit(1, 0x10);
+            _delay_ms(200);
+            dimm_digit(0, 0x00);
+            dimm_digit(1, 0x00);
 
             sleep();
     }
