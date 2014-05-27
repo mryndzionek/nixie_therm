@@ -181,12 +181,10 @@ uint8_t inline onewire_select_device_and_issue_command(const uint8_t cmd, const 
         rom_code[i] = onewire_readbyte();
     }
 
-#ifdef ONEWIRE_CHECK_CRC
     if(onewire_check_rom_crc(&(rom_code[0]), family_code) == EXIT_FAILURE)
     {
         return EXIT_FAILURE;
     }
-#endif // ONEWIRE_CHECK_CRC
 
     onewire_writebyte(cmd);
 
