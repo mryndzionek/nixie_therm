@@ -136,7 +136,7 @@ int main(void) {
                     display_temp(temp);
                     dimm_digit(0, 0xFF);
                     dimm_digit(1, 0xFF);
-                    _delay_ms(500);
+                    _delay_ms(1000);
                     dimm_digit(0, 0xa0);
                     dimm_digit(1, 0xa0);
                     _delay_ms(200);
