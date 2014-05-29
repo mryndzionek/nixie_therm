@@ -11,7 +11,6 @@
 
 #define BLUE_LED PD6
 #define PWM_DIGIT_1 PB2
-#define PWM_DIGIT_2 PB3
 #define RED_LED PB1
 #define BUTTON PB0
 
@@ -38,26 +37,15 @@ static void setup() {
     OCR0A  = 0xFF;
     TCCR0B = _BV(CS01) | _BV(CS00);
 
-    set_output(DDRB, PWM_DIGIT_2);
-    TCCR1A = (1 << COM1A1)| (1 << WGM11) | (1 << WGM10);
-    OCR1A = 0x3FF;
-    TCCR1B = _BV(CS10) | _BV(CS11);
-
     set_input(DDRB, BUTTON);
 
     USI_TWI_Master_Initialise();
 }
 
-static void dimm_digit(unsigned int digit, unsigned int level)
+static void dimm_digit(unsigned int level)
 {
     if(level > 0xFF) level = 0xFF;
-
-    if(digit == 0)
-        OCR0A = level;
-    else {
-            OCR1A = level << 2;
-    }
-
+    OCR0A = level;
 }
 
 static unsigned int display_number(unsigned int n) {
@@ -134,17 +122,13 @@ int main(void) {
             if(rc == EXIT_SUCCESS)
                 {
                     display_temp(temp);
-                    dimm_digit(0, 0xFF);
-                    dimm_digit(1, 0xFF);
+                    dimm_digit(0xFF);
                     _delay_ms(1000);
-                    dimm_digit(0, 0xa0);
-                    dimm_digit(1, 0xa0);
+                    dimm_digit(0xa0);
                     _delay_ms(200);
-                    dimm_digit(0, 0x10);
-                    dimm_digit(1, 0x10);
+                    dimm_digit(0x10);
                     _delay_ms(200);
-                    dimm_digit(0, 0x00);
-                    dimm_digit(1, 0x00);
+                    dimm_digit(0x00);
                 } else {
                         output_high(PORTB, RED_LED);
                         _delay_ms(20);
