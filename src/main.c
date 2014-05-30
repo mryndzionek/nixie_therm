@@ -1,6 +1,7 @@
 
 #include "USI_TWI_Master.h"
 #include "DS1820.h"
+#include "dht22.h"
 #include <avr/io.h>
 #include <util/delay.h>
 
@@ -15,11 +16,6 @@
 #define BUTTON PB0
 
 #define PCF8574_ADDRESS 0x38
-
-#define output_low(port,pin) port &= ~(1<<pin)
-#define output_high(port,pin) port |= (1<<pin)
-#define set_input(portdir,pin) portdir &= ~(1<<pin)
-#define set_output(portdir,pin) portdir |= (1<<pin)
 #define WDT_MAX 4
 
 volatile unsigned int wdt_count = WDT_MAX;
@@ -40,6 +36,8 @@ static void setup() {
     set_input(DDRB, BUTTON);
 
     USI_TWI_Master_Initialise();
+
+    init_DHT22();
 }
 
 static void dimm_digit(unsigned int level)
@@ -51,8 +49,8 @@ static void dimm_digit(unsigned int level)
 static unsigned int display_number(unsigned int n) {
 
     unsigned char data[2];
-    unsigned int digit_1 = 0;
-    unsigned int digit_2 = 0;
+    uint8_t digit_1 = 0;
+    uint8_t digit_2 = 0;
 
     if(n > 99)
         n = 99;
@@ -81,6 +79,30 @@ static void display_temp(int16_t temp)
             output_low(PORTB, BLUE_LED);
 
     display_number(temp>>1);
+}
+
+static void display_dht_value(short int value)
+{
+    if(value < 0)
+        {
+            value = -value;
+            output_high(PORTB, BLUE_LED);
+        }
+    else
+        output_low(PORTB, BLUE_LED);
+
+    display_number(value/10);
+}
+
+static void dimm_seq()
+{
+    dimm_digit(0xFF);
+    _delay_ms(1000);
+    dimm_digit(0xa0);
+    _delay_ms(200);
+    dimm_digit(0x10);
+    _delay_ms(200);
+    dimm_digit(0x00);
 }
 
 ISR(WDT_OVERFLOW_vect)
@@ -122,13 +144,20 @@ int main(void) {
             if(rc == EXIT_SUCCESS)
                 {
                     display_temp(temp);
-                    dimm_digit(0xFF);
-                    _delay_ms(1000);
-                    dimm_digit(0xa0);
-                    _delay_ms(200);
-                    dimm_digit(0x10);
-                    _delay_ms(200);
-                    dimm_digit(0x00);
+                    dimm_seq();
+                } else {
+                        output_high(PORTB, RED_LED);
+                        _delay_ms(20);
+                        output_low(PORTB, RED_LED);
+                }
+
+            DHT22_ERROR_t rd = readData();
+            if(rd == DHT_ERROR_NONE)
+                {
+                    display_dht_value(getTemperatureCInt());
+                    dimm_seq();
+                    display_dht_value(getHumidityInt());
+                    dimm_seq();
                 } else {
                         output_high(PORTB, RED_LED);
                         _delay_ms(20);

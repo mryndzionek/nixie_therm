@@ -5,6 +5,7 @@ add_avr_executable(
 	USI_TWI_Master.c
 	DS1820.c
 	OneWire.c
+	dht22.c
 )
 
 add_avr_executable(
