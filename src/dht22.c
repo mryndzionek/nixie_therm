@@ -4,11 +4,6 @@
 
 #include "dht22.h"
 
-#define output_low(port,pin) port &= ~(1<<pin)
-#define output_high(port,pin) port |= (1<<pin)
-#define set_input(portdir,pin) portdir &= ~(1<<pin)
-#define set_output(portdir,pin) portdir |= (1<<pin)
-
 #define DHT22_DATA_PIN PB4
 
 static volatile uint32_t millisec = 0;
@@ -56,9 +51,7 @@ DHT22_ERROR_t readData()
     checkSum = 0;
     currentTime = millisec;
     for(i = 0; i < DHT22_DATA_BIT_COUNT; i++)
-        {
             bitTimes[i] = 0;
-        }
 
     if(currentTime - sensor._lastReadTime < 2000)
         {

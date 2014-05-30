@@ -15,11 +15,6 @@
 #define BUTTON PB0
 
 #define PCF8574_ADDRESS 0x38
-
-#define output_low(port,pin) port &= ~(1<<pin)
-#define output_high(port,pin) port |= (1<<pin)
-#define set_input(portdir,pin) portdir &= ~(1<<pin)
-#define set_output(portdir,pin) portdir |= (1<<pin)
 #define WDT_MAX 4
 
 volatile unsigned int wdt_count = WDT_MAX;

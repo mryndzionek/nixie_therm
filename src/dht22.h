@@ -1,6 +1,11 @@
 #ifndef _DHT22_H_
 #define _DHT22_H_
 
+#define output_low(port,pin) port &= ~_BV(pin)
+#define output_high(port,pin) port |= _BV(pin)
+#define set_input(portdir,pin) portdir &= ~_BV(pin)
+#define set_output(portdir,pin) portdir |= _BV(pin)
+
 #define DHT22_ERROR_VALUE -995
 
 typedef enum
