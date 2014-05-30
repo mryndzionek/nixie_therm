@@ -14,8 +14,6 @@
 static volatile uint32_t millisec = 0;
 
 struct dht22_t {
-    uint8_t _bitmask;
-    volatile uint8_t *_baseReg;
     unsigned long _lastReadTime;
     short int _lastHumidity;
     short int _lastTemperature;
@@ -80,11 +78,11 @@ DHT22_ERROR_t readData()
                 }
             retryCount++;
             _delay_us(2);
-        } while(bit_is_clear(PORTB, DHT22_DATA_PIN));
+        } while(bit_is_clear(PINB, DHT22_DATA_PIN));
 
     set_output(DDRB, DHT22_DATA_PIN);
     output_low(PORTB, DHT22_DATA_PIN);
-    _delay_us(1100);
+    _delay_us(900);
     set_input(DDRB, DHT22_DATA_PIN);
 
     retryCount = 0;
@@ -96,7 +94,7 @@ DHT22_ERROR_t readData()
                 }
             retryCount++;
             _delay_us(2);
-        } while(bit_is_clear(PORTB, DHT22_DATA_PIN));
+        } while(bit_is_clear(PINB, DHT22_DATA_PIN));
 
     retryCount = 0;
     do
@@ -107,7 +105,7 @@ DHT22_ERROR_t readData()
                 }
             retryCount++;
             _delay_us(2);
-        } while(bit_is_set(PORTB, DHT22_DATA_PIN));
+        } while(bit_is_set(PINB, DHT22_DATA_PIN));
 
     for(i = 0; i < DHT22_DATA_BIT_COUNT; i++)
         {
@@ -121,7 +119,7 @@ DHT22_ERROR_t readData()
                         }
                     retryCount++;
                     _delay_us(2);
-                } while(bit_is_clear(PORTB, DHT22_DATA_PIN));
+                } while(bit_is_clear(PINB, DHT22_DATA_PIN));
             // Measure the width of the data pulse
             retryCount = 0;
             do
@@ -132,7 +130,7 @@ DHT22_ERROR_t readData()
                         }
                     retryCount++;
                     _delay_us(2);
-                } while(bit_is_set(PORTB, DHT22_DATA_PIN));
+                } while(bit_is_set(PINB, DHT22_DATA_PIN));
             bitTimes[i] = retryCount;
         }
 
