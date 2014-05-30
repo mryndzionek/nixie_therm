@@ -71,12 +71,12 @@ static unsigned int display_number(unsigned int n) {
 
 static void display_temp(int16_t temp)
 {
-    if((temp>>8) == 0xFF)
+    if((uint8_t)(temp>>8) == 0xFF)
         {
             temp = ((~temp) & 0xFF) + 1;
-            output_high(PORTB, BLUE_LED);
+            output_high(PORTD, BLUE_LED);
         } else
-            output_low(PORTB, BLUE_LED);
+            output_low(PORTD, BLUE_LED);
 
     display_number(temp>>1);
 }
@@ -86,10 +86,10 @@ static void display_dht_value(short int value)
     if(value < 0)
         {
             value = -value;
-            output_high(PORTB, BLUE_LED);
+            output_high(PORTD, BLUE_LED);
         }
     else
-        output_low(PORTB, BLUE_LED);
+        output_low(PORTD, BLUE_LED);
 
     display_number(value/10);
 }
