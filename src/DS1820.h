@@ -29,68 +29,7 @@
 
 #define DS1820_FAMILY_CODE 0x10
 
-uint8_t ds1820_check_spad_crc(uint8_t* spad);
 uint8_t ds1820_read_spad(uint8_t* spad);
-uint8_t ds1820_write_spad(uint8_t* spad);
-
-#if ONEWIRE_USE_MACROS == 1
-#define ds1820_read_temperature(temperature, error)\
-{\
-    temperature = 0;\
-    if(onewire_select_device_and_issue_command(CMD_18B20_CONV_TEMP, DS1820_FAMILY_CODE) == EXIT_FAILURE)\
-    {\
-        error = EXIT_FAILURE;\
-    }\
-\
-    while(1)\
-    {\
-        if(onewire_readbyte() != 0)\
-        {\
-            break;\
-        }\
-    }\
-\
-    uint8_t spad[SPAD_MAX_BYTES];\
-    if(ds18b20_read_spad(&(spad[0])) == EXIT_FAILURE)\
-    {\
-        error = EXIT_FAILURE;\
-    }\
-\
-    temperature = spad[SPAD_TEMP_MSB];\
-    temperature <<= 8;\
-    temperature |= spad[SPAD_TEMP_LSB];\
-}
-
-#define ds1820_set_resolution(resolution, store_to_eeprom, error)\
-{\
-    uint8_t spad[SPAD_MAX_BYTES];\
-    if(ds18b20_read_spad(&(spad[0])) == EXIT_FAILURE)\
-    {\
-        error = EXIT_FAILURE;\
-    }\
-\
-    uint8_t config = spad[SPAD_CONFIG];\
-    if(((config >> 5) & 3) != resolution)\
-    {\
-        config &= ~(0x3 << 5);\
-        config |= (resolution << 5);\
-        spad[SPAD_CONFIG] = config;\
-        if(ds18b20_write_spad(&(spad[0])) == EXIT_FAILURE)\
-        {\
-            error = EXIT_FAILURE;\
-        }\
-\
-        if(store_to_eeprom != 0)\
-        {\
-            if(onewire_select_device_and_issue_command(CMD_18B20_COPY_SPAD, DS1820_FAMILY_CODE) == EXIT_FAILURE)\
-            {\
-                error = EXIT_FAILURE;\
-            }\
-        }\
-    }\
-}
-#else
 uint8_t ds1820_read_temperature(int16_t* temperature);
-#endif // ONEWIRE_USE_MACROS
 
 #endif // __DS18B20__H__

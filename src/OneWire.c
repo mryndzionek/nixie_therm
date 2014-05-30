@@ -23,7 +23,6 @@
  */
 
 #include "OneWire.h"
-#include <util/crc16.h>
 #include <util/delay.h>
 
 #define MIN_RESET_PULSE 500         // 480 usecs (minimum)
@@ -61,13 +60,13 @@ static void write_slot(const uint8_t value)
     bus_drive0();
 
     if(value == 0)
-    {
-        _delay_us(MIN_RWSLOT_MIN_SLOT_LENGTH);
-    }
+        {
+            _delay_us(MIN_RWSLOT_MIN_SLOT_LENGTH);
+        }
     else
-    {
-        _delay_us(MIN_WRITE1_DRIVE_DELAY);
-    }
+        {
+            _delay_us(MIN_WRITE1_DRIVE_DELAY);
+        }
 
 
     bus_release();
@@ -113,10 +112,10 @@ uint8_t onewire_readbyte()
     uint8_t value = 0;
     uint8_t bit;
     for(bit = 0; bit < 8; ++bit)
-    {
-        // Values come in LSB first
-        value |= (read_slot() << bit);
-    }
+        {
+            // Values come in LSB first
+            value |= (read_slot() << bit);
+        }
 
     return value;
 }
@@ -125,10 +124,10 @@ void onewire_writebyte(const uint8_t data)
 {
     uint8_t bit;
     for(bit = 0; bit < 8; ++bit)
-    {
-        // Values are written LSB first
-        write_slot((data >> bit) & 1);
-    }
+        {
+            // Values are written LSB first
+            write_slot((data >> bit) & 1);
+        }
 }
 
 void inline onewire_init()
@@ -137,54 +136,20 @@ void inline onewire_init()
     ONEWIRE_PORT &= ~(1 << ONEWIRE_PIN);
 }
 
-uint8_t onewire_check_rom_crc(const uint8_t* romcode, const uint8_t family_code)
-{
-    /* ROM CRC
-     * 64 bit value
-     * 63:56 : 8-bit CRC
-     * 55:8  : 48-bit serial number
-     * 7:0   : 8-bit family code
-     */
-
-    if(romcode[0] != family_code)
-    {
-        if(family_code != 0xFF)
-        {
-            return EXIT_FAILURE;
-        }
-    }
-
-    uint16_t crc = 0;
-    uint8_t i;
-    for(i = 0; i < 8; ++i)
-    {
-        crc = _crc_ibutton_update(crc, romcode[i]);
-    }
-
-    return (crc == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
-}
-
 uint8_t inline onewire_select_device_and_issue_command(const uint8_t cmd, const uint8_t family_code)
 {
     uint8_t dev_present = onewire_reset();
     if(dev_present == 0)
-    {
-        return EXIT_FAILURE;
-    }
+        {
+            return EXIT_FAILURE;
+        }
 
     onewire_writebyte(CMD_ONEWIRE_READ_ROM);
 
-    uint8_t rom_code[8];
     uint8_t i;
     for(i = 0; i < 8; i++)
-    {
-        rom_code[i] = onewire_readbyte();
-    }
+        onewire_readbyte();
 
-    if(onewire_check_rom_crc(&(rom_code[0]), family_code) == EXIT_FAILURE)
-    {
-        return EXIT_FAILURE;
-    }
 
     onewire_writebyte(cmd);
 

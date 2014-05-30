@@ -59,14 +59,6 @@
 
 uint8_t onewire_select_device_and_issue_command(const uint8_t cmd, const uint8_t family_code);
 
-// Check the specified rom code, which is a uint8_t array of size 8
-// this includes:
-// 1 byte family code
-// 12 byte serial number
-// 1 byte CRC
-// Returns EXIT_SUCCESS or EXIT_FAILURE
-uint8_t onewire_check_rom_crc(const uint8_t* romcode, const uint8_t family_code);
-
 // Initialize the 1-wire lib
 void onewire_init();
 
