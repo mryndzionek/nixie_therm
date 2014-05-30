@@ -6,3 +6,10 @@ add_avr_executable(
 	DS1820.c
 	OneWire.c
 )
+
+add_avr_executable(
+    dht
+    dht22_test.c
+	USI_TWI_Master.c
+	dht22.c
+)
