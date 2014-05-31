@@ -16,7 +16,7 @@
 #define BUTTON PB0
 
 #define PCF8574_ADDRESS 0x38
-#define WDT_MAX 4
+#define WDT_MAX 8
 
 volatile unsigned int wdt_count = WDT_MAX;
 volatile unsigned int button = 0;
@@ -167,9 +167,10 @@ int main(void) {
             if(button)
                 button = 0;
 
+            wdt_count = WDT_MAX;
+
             while(wdt_count && (button == 0))
                 sleep();
 
-            wdt_count = WDT_MAX;
     }
 }
