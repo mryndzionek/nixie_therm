@@ -18,7 +18,7 @@
 #define PCF8574_ADDRESS 0x38
 #define WDT_MAX 8
 
-volatile unsigned int wdt_count = WDT_MAX;
+volatile unsigned int wdt_count = 0;
 volatile unsigned int button = 0;
 
 static void setup() {
@@ -48,7 +48,7 @@ static void dimm_digit(unsigned int level)
 
 static unsigned int display_number(unsigned int n) {
 
-    unsigned char data[2];
+    unsigned char data[3] = {0, 0, 0};
     uint8_t digit_1 = 0;
     uint8_t digit_2 = 0;
 
@@ -64,6 +64,8 @@ static unsigned int display_number(unsigned int n) {
     data[0] = PCF8574_ADDRESS << 1;
     data[1] = (digit_1 << 4) | (digit_2);
 
+
+    USI_TWI_Start_Transceiver_With_Data(data, 2);
     USI_TWI_Start_Transceiver_With_Data(data, 2);
 
     return  USI_TWI_Get_State_Info();
@@ -107,7 +109,7 @@ static void dimm_seq()
 
 ISR(WDT_OVERFLOW_vect)
 {
-    wdt_count--;
+    ++wdt_count;
 }
 
 ISR (PCINT_vect)
@@ -167,9 +169,9 @@ int main(void) {
             if(button)
                 button = 0;
 
-            wdt_count = WDT_MAX;
+            wdt_count = 0;
 
-            while(wdt_count && (button == 0))
+            while((wdt_count < WDT_MAX) && (button == 0))
                 sleep();
 
     }
