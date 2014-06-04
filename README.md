@@ -8,8 +8,8 @@ Introduction
 
 Simple 1-wire thermometer with two-digit nixie display 
 
-How to build
-------------
+How to compile and upload firmware
+----------------------------------
 
 1. Configure the project:
 
