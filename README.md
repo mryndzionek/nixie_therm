@@ -56,6 +56,7 @@ The nixies can be dimmed using MPSA92+MPSA42 anode drivers.
 | PB5  | I2C SDA |
 | PB7  | I2C SCL |
 
+![nixie_therm](images/nixie_i2c_module.png?raw=true "Nixie i2c module")
 
 Contact
 -------
