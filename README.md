@@ -32,7 +32,9 @@ Hardware setup
 --------------
 
 Attiny2313 on a perfboard. Internal RC oscilator - 8Mhz.
-Fuses set to: `-U lfuse:w:0xe4:m -U hfuse:w:0x9f:m -U efuse:w:0xff:m`.
+Fuses set to: 
+		`-U lfuse:w:0xe4:m -U hfuse:w:0x9f:m -U efuse:w:0xff:m`.
+
 ISP header at the back of the perfboard for easy reprogramming.
 The DS1820 sensor connected using 3-wire tape for external temperature measurements.
 AM2302 (DHT22) sensor on the main perfboard - internal temperature and humidity measurements.
