@@ -10,6 +10,7 @@
 #include <avr/interrupt.h>
 #include <avr/power.h>
 
+#define NO_PWM
 #define BLUE_LED PD6
 #define PWM_DIGIT_1 PB2
 #define RED_LED PB1
@@ -29,10 +30,13 @@ static void setup() {
     output_low(PORTB, RED_LED);
 
     set_output(DDRB, PWM_DIGIT_1);
+#ifndef NO_PWM
     TCCR0A = _BV(COM0A1) | _BV(WGM00);
     OCR0A  = 0xFF;
     TCCR0B = _BV(CS01) | _BV(CS00);
-
+#else
+    output_high(PORTB, PWM_DIGIT_1);
+#endif
     set_input(DDRB, BUTTON);
 
     USI_TWI_Master_Initialise();
@@ -40,23 +44,26 @@ static void setup() {
     init_DHT22();
 }
 
+#ifndef NO_PWM
 static void dimm_digit(unsigned int level)
 {
     if(level > 0xFF) level = 0xFF;
     OCR0A = level;
 }
-
+#endif
 static unsigned int display_number(unsigned int n) {
 
     unsigned char data[3] = {0, 0, 0};
     uint8_t digit_1 = 0;
     uint8_t digit_2 = 0;
 
-    if(n > 99)
-        n = 99;
-
-    digit_1 = n % 10;
-    digit_2 = n / 10;
+    if(n<100){
+            digit_1 = n % 10;
+            digit_2 = n / 10;
+    } else {
+            digit_1 = 0x0f;
+            digit_2 = 0x0f;
+    }
 
     if (digit_2 == 8) digit_2 = 9;
     else if (digit_2 == 9) digit_2 = 8;
@@ -98,6 +105,7 @@ static void display_dht_value(short int value)
 
 static void dimm_seq()
 {
+#ifndef NO_PWM
     dimm_digit(0xFF);
     _delay_ms(1000);
     dimm_digit(0xa0);
@@ -105,6 +113,10 @@ static void dimm_seq()
     dimm_digit(0x10);
     _delay_ms(200);
     dimm_digit(0x00);
+#else
+    _delay_ms(1400);
+    display_number(0xff);
+#endif
 }
 
 ISR(WDT_OVERFLOW_vect)
