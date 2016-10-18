@@ -39,8 +39,8 @@ Fuses set to:
 ISP header at the back of the perfboard for easy reprogramming.
 The DS1820 sensor connected using 3-wire tape for external temperature measurements.
 AM2302 (DHT22) sensor on the main perfboard - internal temperature and humidity measurements.
-Nixies on a separate board together with PCF8574 GPIO expander and two russian K155ID1 BCD decoders.
-It comprises a module that communicates with the MCU only via I2C bus so it is possible to add up to 8 modules (16 nixie tubes !!!).
+Nixies on a separate board together with PCF8574 GPIO expander and two Russian K155ID1 BCD decoders.
+It comprises a module that communicates with the MCU only via I2C bus, so it is possible to add up to 8 modules (16 nixie tubes !!!).
 The HV PSU is based on [this](http://threeneurons.files.wordpress.com/2011/08/mc34063_mk15cm1.gif?w=500&h=384) schematic.
 It uses the MC34063 switching regulator with external MOSFET and an active pull-down.
 The nixies can be dimmed using MPSA92+MPSA42 anode drivers.
